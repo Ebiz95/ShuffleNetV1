@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers, regularizers, activations
+from tensorflow.keras import layers
 
 
 class FirstConv1x1Block(layers.Layer):
