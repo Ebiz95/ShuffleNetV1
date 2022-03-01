@@ -21,6 +21,7 @@ class FirstConv1x1Block(layers.Layer):
         x = tf.nn.relu(x)
         return x
 
+
 class SecondConv1x1Block(layers.Layer):
     def __init__(self, filters, groups):
         super().__init__()
@@ -37,7 +38,6 @@ class SecondConv1x1Block(layers.Layer):
         x = self.conv1x1(x)
         x = self.bn(x, training=training)
         return x
-
 
 
 class ShuffleUnit(layers.Layer):
@@ -92,6 +92,12 @@ class ShuffleUnit(layers.Layer):
         output = tf.reshape(x_transposed, [-1, h, w, c])
         return output
 
+    def combine_func(self, x, y):
+        if self.combine == 'add':
+            return tf.add(x, y)
+        else: # concat
+            return tf.concat([x, y], axis=-1)
+
     def call(self, inputs, training=False):
         residuals = inputs
         if self.combine == 'concat':
@@ -100,7 +106,7 @@ class ShuffleUnit(layers.Layer):
         x = self.first_conv_1x1(inputs, training=training)
         if self.grouped_conv:
             x = self.channel_shuffle(x)
-        x = self.DWConv_3x3(x, training=training)
+        x = self.DWConv_3x3(x)
         x = self.bn(x, training=training)
         if not self.grouped_conv:
             x = tf.nn.relu(x)
@@ -109,11 +115,6 @@ class ShuffleUnit(layers.Layer):
         self.combine_func(residuals, x)
         return tf.nn.relu(x)
 
-    def combine_func(self, x, y):
-        if self.combine == 'add':
-            return tf.add(x, y)
-        else: # concat
-            return tf.concat([x, y], axis=-1)
 
 class ShuffleNet(keras.Model):
     def __init__(self, groups, num_classes=1000) -> None:
@@ -166,21 +167,19 @@ class ShuffleNet(keras.Model):
                 )
             )   
         name = f"stage_{stage}"
-        stage = keras.Sequential(name=name)
-        for unit in units:
-            stage.add(unit)
+        stage = keras.Sequential(units, name=name)
         return stage
 
     def call(self, inputs, training=False):
-        x = self.conv1(inputs, training=training)
-        x = self.max_pool(x, training=training)
+        x = self.conv1(inputs)
+        x = self.max_pool(x)
         x = self.stage2(x, training=training)
         x = self.stage3(x, training=training)
         x = self.stage4(x, training=training)
-        x = self.global_pool(x, training=training)
-        x = self.fc(x, training=training)
+        x = self.global_pool(x)
+        x = self.fc(x)
         return x
 
     def model(self, input_shape):
-        x = keras.Input(shape=input_shape)
+        x = keras.Input(shape=input_shape, dtype=tf.float32)
         return keras.Model(inputs=[x], outputs=self.call(x))
