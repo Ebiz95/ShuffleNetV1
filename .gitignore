@@ -1,3 +1,11 @@
+# Own data
+data/
+
+# Own ignores
+*.yml
+model_pytorch.py
+*test*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
