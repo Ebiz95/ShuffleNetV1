@@ -76,7 +76,7 @@ class ShuffleUnit(layers.Layer):
         self.DWConv_3x3 = layers.DepthwiseConv2D(
             kernel_size=3, 
             strides=dw_stride, 
-            padding='same'
+            padding='same',
         )
         self.bn = layers.BatchNormalization()
         self.second_conv_1x1 = SecondConv1x1Block(
@@ -104,7 +104,7 @@ class ShuffleUnit(layers.Layer):
             residuals = self.avg_pool(residuals)
 
         x = self.first_conv_1x1(inputs, training=training)
-        if self.grouped_conv:
+        if self.groups != 1:
             x = self.channel_shuffle(x)
         x = self.DWConv_3x3(x)
         x = self.bn(x, training=training)
