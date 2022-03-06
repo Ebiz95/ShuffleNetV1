@@ -77,9 +77,6 @@ def main():
 
     print(model.model((args.img_height, args.img_width, 3)).summary())
 
-    # config = model.get_config() # Returns pretty much every information about your model
-    # print(config["layers"][0]["config"]["batch_input_shape"]) # returns a tuple of width, height and channels
-    
     model.fit(ds_train, epochs=1, verbose=1)
 
 
