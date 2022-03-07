@@ -29,7 +29,7 @@ def prepare_dataset(args):
         args.data_dir,
         labels="inferred",
         label_mode="int",
-        class_names=['boat', 'no_boat'],
+        class_names=['boats', 'no_boats'],
         color_mode='rgb',
         batch_size=args.batch_size,
         image_size=(args.img_height, args.img_width),  # reshape if not in this size
@@ -43,7 +43,7 @@ def prepare_dataset(args):
         args.data_dir,
         labels="inferred",
         label_mode="int",  # categorical, binary
-        class_names=['boat', 'no_boat'],
+        class_names=['boats', 'no_boats'],
         color_mode='rgb',
         batch_size=args.batch_size,
         image_size=(args.img_height, args.img_width),  # reshape if not in this size
@@ -77,7 +77,7 @@ def main():
 
     print(model.model((args.img_height, args.img_width, 3)).summary())
 
-    model.fit(ds_train, epochs=1, verbose=1)
+    model.fit(ds_train, epochs=args.epochs, verbose=2)
 
 
 if __name__ == "__main__":
