@@ -2,7 +2,6 @@ import argparse
 import os
 import pandas as pd
 import shutil
-# from IPython.print import clear_output, print
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
@@ -20,15 +19,6 @@ def main(opt):
     destination_path_boats = f"{opt.destdir}/boats/"
     destination_path_no_boats = f"{opt.destdir}/no_boats/"
 
-    # Check if directory needs to be created
-    # tmp  = destination_path_boats.strip("images/")
-    # if not os.path.exists(tmp):
-    #     os.makedirs(tmp)
-    #     print(f"'{tmp}' directory is created!")
-    #     tmp  = destination_path_no_boats.strip("images/")
-    # if not os.path.exists(tmp):
-    #     os.makedirs(tmp)
-    #     print(f"'{tmp}' directory is created!")
     if not os.path.exists(destination_path_boats):
         os.makedirs(destination_path_boats)
         print(f"'{destination_path_boats}' directory is created!")
