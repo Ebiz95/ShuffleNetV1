@@ -89,7 +89,7 @@ def main():
         save_freq=args.save_interval*2558
     )
 
-    model.save_weights("{checkpoint_path}/cp-{epoch:04d}".format(checkpoint_path, epoch=0))
+    model.save_weights("{}/cp-{epoch:04d}".format(checkpoint_path, epoch=0))
 
     model.fit(ds_train, epochs=args.epochs, verbose=1, callbacks=[cp_callback])
 
