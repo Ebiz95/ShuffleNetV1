@@ -5,19 +5,24 @@ import shutil
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--sourcedir', type=str, help='path to the folder containing images')
+    parser.add_argument('--src-dir', type=str, help='path to the folder containing images')
     parser.add_argument('--csv', type=str, help='your csv file (path)')
-    parser.add_argument('--destdir', type=str, help='folder where no_boat/boat directory is saved')
+    parser.add_argument('--dest-dir', type=str, help='folder where no_boat/boat directory is saved')
 
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
 def main(opt):
     # Get target and source directories
-    images_path = opt.sourcedir
+    images_path = opt.src_dir
 
-    destination_path_boats = f"{opt.destdir}/boats/"
-    destination_path_no_boats = f"{opt.destdir}/no_boats/"
+    if not os.path.exists(opt.dest_dir):
+        print(f"The destination directory does not exist. Creating a new destination directory...")
+        os.makedirs(opt.dest_dir)
+        print(f"'{opt.dest_dir}' directory is created!")
+
+    destination_path_boats = f"{opt.dest_dir}/boats/"
+    destination_path_no_boats = f"{opt.dest_dir}/no_boats/"
 
     if not os.path.exists(destination_path_boats):
         os.makedirs(destination_path_boats)
