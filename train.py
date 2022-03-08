@@ -80,7 +80,7 @@ def main():
 
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H:%M")
-    checkpoint_path = f"{args.save_dir}/model_weights/{dt_string}/"
+    checkpoint_path = f"{args.save_dir}/model_weights/{dt_string}"
 
     cp_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_path, 
@@ -88,6 +88,8 @@ def main():
         save_weights_only=True,
         save_freq=args.save_interval*2558
     )
+
+    model.save_weights("{checkpoint_path}/cp-{epoch:04d}".format(checkpoint_path, epoch=0))
 
     model.fit(ds_train, epochs=args.epochs, verbose=1, callbacks=[cp_callback])
 
