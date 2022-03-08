@@ -79,14 +79,14 @@ def main():
     print(model.model((args.img_height, args.img_width, 3)).summary())
 
     now = datetime.now()
-    dt_string = now.strftime("%d/%m/%Y %H:%M")
+    dt_string = now.strftime("%d-%m-%Y_%H:%M")
     checkpoint_path = f"{args.save_dir}/model_weights/{dt_string}/"
 
     cp_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_path, 
         verbose=1, 
         save_weights_only=True,
-        save_freq=args.save_interval*args.batch_size
+        save_freq=args.save_interval*2558
     )
 
     model.fit(ds_train, epochs=args.epochs, verbose=1, callbacks=[cp_callback])
