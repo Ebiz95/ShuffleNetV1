@@ -11,7 +11,7 @@ def get_args():
 
     parser.add_argument('--batch-size', type=int, default=128, help='batch size')
     parser.add_argument('--epochs', type=int, default=100, help='total epochs')
-    parser.add_argument('--save', type=str, default='./models', help='path for saving trained models')
+    parser.add_argument('--save-dir', type=str, default='./models', help='path for saving trained models')
     parser.add_argument('--save-interval', type=int, default=10, help='save interval')
 
     parser.add_argument('--img-height', type=int, default=768, help='image height')
@@ -77,7 +77,9 @@ def main():
 
     print(model.model((args.img_height, args.img_width, 3)).summary())
 
-    model.fit(ds_train, epochs=args.epochs, verbose=2)
+    model.fit(ds_train, epochs=args.epochs, verbose=1)
+
+    model.save(args.save_dir)
 
 
 if __name__ == "__main__":
