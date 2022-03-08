@@ -1,5 +1,6 @@
 import os
 import argparse
+from datetime import datetime
 import tensorflow as tf
 from tensorflow import keras
 from model import ShuffleNet
@@ -77,9 +78,21 @@ def main():
 
     print(model.model((args.img_height, args.img_width, 3)).summary())
 
-    model.fit(ds_train, epochs=args.epochs, verbose=1)
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M")
+    checkpoint_path = f"{args.save_dir}/model_weights/{dt_string}/"
 
-    model.save(args.save_dir)
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_path, 
+        verbose=1, 
+        save_weights_only=True,
+        save_freq=args.save_interval*args.batch_size
+    )
+
+    model.fit(ds_train, epochs=args.epochs, verbose=1, callbacks=[cp_callback])
+
+    model_path = f"{args.save_dir}/models/{dt_string}/"
+    model.save(model_path)
 
 
 if __name__ == "__main__":
