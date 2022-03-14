@@ -82,6 +82,7 @@ def main():
     print(model.model((args.img_height, args.img_width, 3)).summary())
 
     if not args.weights_path is None:
+        model.built = True
         model.load_weights(args.weights_path)
 
     now = datetime.now()
