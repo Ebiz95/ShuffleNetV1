@@ -22,6 +22,9 @@ def get_args():
 
     parser.add_argument('--data-dir', type=str, default='data/', help='path to training dataset')
 
+    parser.add_argument('--weights-path', type=str, default=None, help='path to saved model weights')
+    parser.add_argument('--model-dir', type=str, default=None, help='path to saved model')
+
     args = parser.parse_args()
     return args
 
@@ -78,18 +81,21 @@ def main():
 
     print(model.model((args.img_height, args.img_width, 3)).summary())
 
+    if not args.weights_path is None:
+        model.load_weights(args.weights_path)
+
     now = datetime.now()
     dt_string = now.strftime("%d-%m-%Y_%H:%M")
-    checkpoint_path = f"{args.save_dir}/model_weights/{dt_string}"
+    checkpoint_path = f"{args.save_dir}/model_weights/{dt_string}/"
 
     cp_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_path, 
         verbose=1, 
         save_weights_only=True,
-        save_freq=args.save_interval*2558
+        save_freq=args.save_interval * 2558 # Number of images / batch_size
     )
 
-    model.save_weights("{}/cp-{epoch:04d}".format(checkpoint_path, epoch=0))
+    model.save_weights("cp-{epoch:03d}".format(epoch=0))
 
     model.fit(ds_train, epochs=args.epochs, verbose=1, callbacks=[cp_callback])
 
