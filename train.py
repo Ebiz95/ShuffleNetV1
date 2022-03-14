@@ -96,7 +96,7 @@ def main():
         save_freq=args.save_interval * 2558 # Number of images / batch_size
     )
 
-    model.save_weights("cp-{epoch:03d}".format(epoch=0))
+    model.save_weights("cp-{epoch:03d}.ckpt".format(epoch=0))
 
     model.fit(ds_train, epochs=args.epochs, verbose=1, callbacks=[cp_callback])
 
