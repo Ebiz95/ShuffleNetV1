@@ -103,7 +103,7 @@ def main():
 
         model.fit(ds_train, epochs=args.epochs, verbose=1, callbacks=[cp_callback])
 
-        model_path = f"{args.save_dir}/models/{dt_string}/"
+        model_path = f"{args.save_dir}/models/{dt_string}/model.h5"
         model.save(model_path)
 
 
