@@ -8,6 +8,7 @@ def parse_opt(known=False):
     parser.add_argument('--src-dir', type=str, help='path to the folder containing images')
     parser.add_argument('--csv', type=str, help='your csv file (path)')
     parser.add_argument('--dest-dir', type=str, help='folder where no_boat/boat directory is saved')
+    parser.add_argument('--num-imgs', type=int, default=-1, help='Number of images that are to be split. -1 means all of the images will be split')
 
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
@@ -67,6 +68,9 @@ def main(opt):
             print(f"{index}/{max}")
             print(f"Added number of boats: {nr_boats}")
             print(f"Added number of no boats: {nr_no_boats}")
+        
+        if opt.num_imgs != -1 and index > opt.num_imgs:
+            break
             
     # clear_output()
     print(f"{max}/{max}")
