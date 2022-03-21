@@ -67,41 +67,44 @@ def main():
 
     ds_train, _ = prepare_dataset(args)
 
-    print("Init model")
-    model = ShuffleNet(groups=args.groups, num_classes=args.num_classes)
-    print("Init model done")
+    strategy = tf.distribute.MirroredStrategy()
+    with strategy.scope():
+        print("Init model")
+        model = ShuffleNet(groups=args.groups, num_classes=args.num_classes)
+        print("Init model done")
 
-    print("Model compiling")
-    model.compile(
-        optimizer=keras.optimizers.Adam(),
-        loss=[keras.losses.SparseCategoricalCrossentropy(from_logits=True),],
-        metrics=["accuracy"],
-    )
-    print("Model compiling done")
+        if not args.weights_path is None:
+            # model.built = True
+            model.load_weights(args.weights_path)
 
-    print(model.model((args.img_height, args.img_width, 3)).summary())
+        print("Model compiling...")
+        model.compile(
+            optimizer=keras.optimizers.Adam(),
+            loss=[keras.losses.SparseCategoricalCrossentropy(from_logits=True),],
+            metrics=["accuracy"],
+        )
+        print("Model compiling done")
 
-    if not args.weights_path is None:
-        model.built = True
-        model.load_weights(args.weights_path)
+        print(model.model((args.img_height, args.img_width, 3)).summary())
 
-    now = datetime.now()
-    dt_string = now.strftime("%d-%m-%Y_%H:%M")
-    checkpoint_path = f"{args.save_dir}/model_weights/{dt_string}/"
 
-    cp_callback = tf.keras.callbacks.ModelCheckpoint(
-        filepath=checkpoint_path, 
-        verbose=1, 
-        save_weights_only=True,
-        save_freq=args.save_interval * args.batch_size # Number of images / batch_size
-    )
+        now = datetime.now()
+        dt_string = now.strftime("%d-%m-%Y_%H:%M")
+        checkpoint_path = f"{args.save_dir}/model_weights/{dt_string}/"
 
-    model.save_weights("cp-{epoch:04d}.ckpt".format(epoch=0))
+        cp_callback = tf.keras.callbacks.ModelCheckpoint(
+            filepath=checkpoint_path, 
+            verbose=1, 
+            save_weights_only=True,
+            save_freq=args.save_interval * args.batch_size # Number of images / batch_size
+        )
 
-    model.fit(ds_train, epochs=args.epochs, verbose=1, callbacks=[cp_callback])
+        model.save_weights("cp-{epoch:04d}.ckpt".format(epoch=0))
 
-    model_path = f"{args.save_dir}/models/{dt_string}/"
-    model.save(model_path)
+        model.fit(ds_train, epochs=args.epochs, verbose=1, callbacks=[cp_callback])
+
+        model_path = f"{args.save_dir}/models/{dt_string}/"
+        model.save(model_path)
 
 
 if __name__ == "__main__":
