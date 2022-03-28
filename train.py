@@ -106,6 +106,7 @@ def main():
 
         print("Init converter")
         converter = tf.lite.TFLiteConverter.from_keras_model(model)
+        converter.target_spec.supported_types = [tf.float16]
         print("Init converter done")
         print("Converting model")
         tflite_model = converter.convert()
