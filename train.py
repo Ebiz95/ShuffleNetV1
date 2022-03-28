@@ -92,17 +92,10 @@ def main():
         dt_string = now.strftime("%d-%m-%Y_%H:%M")
         checkpoint_path = f"{args.save_dir}/model_weights/{dt_string}/"
 
-        # cp_callback = tf.keras.callbacks.ModelCheckpoint(
-        #     filepath=checkpoint_path,
-        #     verbose=1,
-        #     save_weights_only=True,
-        #     save_freq=args.save_interval * args.batch_size # Number of images / batch_size
-        # )
-
         model.fit(ds_train, epochs=args.epochs, verbose=1)
         model.save_weights(f"{checkpoint_path}")
 
-        model_path = f"{args.save_dir}/models/{dt_string}/model.h5"
+        model_path = f"{args.save_dir}/models/{dt_string}/"
         model.save(model_path)
 
 
