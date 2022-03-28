@@ -104,10 +104,19 @@ def main():
         model_path = f"{args.save_dir}/models/{dt_string}/"
         model.save(model_path)
 
+        print("Init converter")
         converter = tf.lite.TFLiteConverter.from_keras_model(model)
+        print("Init converter done")
+        print("Converting model")
         tflite_model = converter.convert()
+        print("Converting model done")
 
-        with open(f"{args.save_dir}/models-tflite/{dt_string}/model.tflite", 'wb') as f:
+        tflite_model_path = f"{args.save_dir}/models-tflite/{dt_string}"
+        if not os.path.exists(tflite_model_path):
+            os.makedirs(tflite_model_path)
+            print(f"'{tflite_model_path}' directory is created!")
+
+        with open(f"{tflite_model_path}/model.tflite", 'wb') as f:
             f.write(tflite_model)
 
 if __name__ == "__main__":
