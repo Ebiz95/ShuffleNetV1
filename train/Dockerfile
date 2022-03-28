@@ -10,3 +10,6 @@ RUN pip install --no-cache -r requirements.txt
 
 # Install tool for session handling
 RUN apt-get install -y tmux
+
+WORKDIR ../
+RUN git clone https://github.com/Ebiz95/ShuffleNetV1.git
