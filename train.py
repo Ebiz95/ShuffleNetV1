@@ -90,14 +90,25 @@ def main():
 
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y_%H:%M")
-        checkpoint_path = f"{args.save_dir}/model_weights/{dt_string}/"
+
+        # cp_callback = tf.keras.callbacks.ModelCheckpoint(
+        #     filepath=checkpoint_path,
+        #     verbose=1,
+        #     save_weights_only=True,
+        #     save_freq=args.save_interval * args.batch_size # Number of images / batch_size
+        # )
 
         model.fit(ds_train, epochs=args.epochs, verbose=1)
-        model.save_weights(f"{checkpoint_path}")
+        model.save_weights(f"{args.save_dir}/model_weights/{dt_string}/")
 
         model_path = f"{args.save_dir}/models/{dt_string}/"
         model.save(model_path)
 
+        converter = tf.lite.TFLiteConverter.from_keras_model(model)
+        tflite_model = converter.convert()
+
+        with open(f"{args.save_dir}/models-tflite/{dt_string}/model.tflite", 'wb') as f:
+            f.write(tflite_model)
 
 if __name__ == "__main__":
     main()
