@@ -13,3 +13,5 @@ RUN apt-get install -y tmux
 
 WORKDIR /
 RUN git clone https://github.com/Ebiz95/ShuffleNetV1.git
+WORKDIR /ShuffleNetV1/
+RUN git pull
