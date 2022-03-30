@@ -65,7 +65,12 @@ def main():
     print(f"num classes: {args.num_classes}")
     print(f"batch size: {args.batch_size}")
 
-    ds_train, _ = prepare_dataset(args)
+    ds_train, ds_val = prepare_dataset(args)
+
+    AUTOTUNE = tf.data.AUTOTUNE
+
+    ds_train = ds_train.cache().prefetch(buffer_size=AUTOTUNE)
+    ds_val = ds_val.cache().prefetch(buffer_size=AUTOTUNE)
 
     strategy = tf.distribute.MirroredStrategy()
     with strategy.scope():
@@ -98,7 +103,7 @@ def main():
         #     save_freq=args.save_interval * args.batch_size # Number of images / batch_size
         # )
 
-        model.fit(ds_train, epochs=args.epochs, verbose=1)
+        model.fit(ds_train, validation_data=ds_val, epochs=args.epochs, verbose=1)
         model.save_weights(f"{args.save_dir}/model_weights/{dt_string}/")
 
         model_path = f"{args.save_dir}/models/{dt_string}/"

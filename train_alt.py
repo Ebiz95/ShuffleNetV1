@@ -95,8 +95,7 @@ def main():
         )
         print("Model compiling done")
 
-        print(model.model((args.img_height, args.img_width, 3)).summary())
-
+        print(model.summary())
 
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y_%H:%M")
