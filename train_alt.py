@@ -59,7 +59,12 @@ def main():
     print(f"num classes: {args.num_classes}")
     print(f"batch size: {args.batch_size}")
 
-    ds_train, _ = prepare_dataset(args)
+    ds_train, ds_val = prepare_dataset(args)
+
+    AUTOTUNE = tf.data.AUTOTUNE
+
+    ds_train = ds_train.cache().prefetch(buffer_size=AUTOTUNE)
+    ds_val = ds_val.cache().prefetch(buffer_size=AUTOTUNE)
 
     strategy = tf.distribute.MirroredStrategy()
     with strategy.scope():
@@ -72,8 +77,6 @@ def main():
                 layers.Conv2D(filters=24, kernel_size=3, strides=2, activation='relu', padding='same'),
                 layers.MaxPool2D(pool_size=3, strides=2, padding='same'),
                 layers.Conv2D(filters=144, kernel_size=3, strides=2, activation='relu', padding='same'),
-                layers.MaxPool2D(pool_size=3, strides=2, padding='same'),
-                layers.Conv2D(filters=288, kernel_size=3, strides=2, activation='relu'),
                 layers.MaxPool2D(pool_size=3, strides=2, padding='same'),
                 layers.GlobalAveragePooling2D(),
                 layers.Dense(512, activation="relu"),
@@ -105,7 +108,7 @@ def main():
         #     save_freq=args.save_interval * args.batch_size # Number of images / batch_size
         # )
 
-        model.fit(ds_train, epochs=args.epochs, verbose=1)
+        model.fit(ds_train, validation_data=ds_val, epochs=args.epochs, verbose=1)
         model.save_weights(f"{args.save_dir}/model_weights/{dt_string}/")
 
         model_path = f"{args.save_dir}/models/{dt_string}/"
@@ -113,7 +116,7 @@ def main():
 
         print("Init converter")
         converter = tf.lite.TFLiteConverter.from_keras_model(model)
-        converter.target_spec.supported_types = [tf.float16]
+        converter.target_spec.supported_types = [tf.float32]
         print("Init converter done")
         print("Converting model")
         tflite_model = converter.convert()
