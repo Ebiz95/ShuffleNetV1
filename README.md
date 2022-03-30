@@ -10,3 +10,7 @@ python3 divide_boat_no_boat.py --src-dir ../data/train/images --csv ../data/trai
 ````bash
 python3 train.py --save-dir ../project/shuffleNet-results --save-interval 5 --img-height 768 --img-width 768 --num-classes 2 --groups 3 --batch-size 100 --epochs 1
 ````
+
+````bash
+python3 train_alt.py --save-dir ../project/shuffleNet-results --img-height 768 --img-width 768 --num-classes 2 --batch-size 100 --epochs 1
+````
