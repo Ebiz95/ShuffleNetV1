@@ -61,13 +61,13 @@ def main():
 
     ds_train, ds_val = prepare_dataset(args)
 
-    AUTOTUNE = tf.data.AUTOTUNE
-
-    ds_train = ds_train.cache().prefetch(buffer_size=AUTOTUNE)
-    ds_val = ds_val.cache().prefetch(buffer_size=AUTOTUNE)
 
     strategy = tf.distribute.MirroredStrategy()
     with strategy.scope():
+        AUTOTUNE = tf.data.AUTOTUNE
+
+        ds_train = ds_train.cache().prefetch(buffer_size=AUTOTUNE)
+        ds_val = ds_val.cache().prefetch(buffer_size=AUTOTUNE)
         print("Init model")
         # model = ShuffleNet(groups=args.groups, num_classes=args.num_classes)
 
