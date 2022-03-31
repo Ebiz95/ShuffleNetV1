@@ -22,8 +22,28 @@ def main(opt):
         os.makedirs(opt.dest_dir)
         print(f"'{opt.dest_dir}' directory is created!")
 
-    destination_path_boats = f"{opt.dest_dir}/boats/"
-    destination_path_no_boats = f"{opt.dest_dir}/no_boats/"
+    if not os.path.exists(f"{opt.dest_dir}/train/"):
+        print(f"The trining directory does not exist. Creating a new destination directory...")
+        os.makedirs(f"{opt.dest_dir}/train/")
+        print(f"'{opt.dest_dir}/train/' directory is created!")
+
+    if not os.path.exists(f"{opt.dest_dir}/test/"):
+        print(f"The testing directory does not exist. Creating a new destination directory...")
+        os.makedirs(f"{opt.dest_dir}/test/")
+        print(f"'{opt.dest_dir}/test/' directory is created!")    
+
+    destination_path_boats = f"{opt.dest_dir}/test/boats/"
+    destination_path_no_boats = f"{opt.dest_dir}/test/no_boats/"
+
+    if not os.path.exists(destination_path_boats):
+        os.makedirs(destination_path_boats)
+        print(f"'{destination_path_boats}' directory is created!")
+    if not os.path.exists(destination_path_no_boats):
+        os.makedirs(destination_path_no_boats)
+        print(f"'{destination_path_no_boats}' directory is created!")
+
+    destination_path_boats = f"{opt.dest_dir}/train/boats/"
+    destination_path_no_boats = f"{opt.dest_dir}/train/no_boats/"
 
     if not os.path.exists(destination_path_boats):
         os.makedirs(destination_path_boats)
@@ -48,6 +68,9 @@ def main(opt):
     nr_no_boats = 0
 
     for index, row in df.iterrows():
+        if index == 154044: # 80% split
+            destination_path_boats = f"{opt.dest_dir}/test/boats/"
+            destination_path_no_boats = f"{opt.dest_dir}/test/no_boats/"
         mask = row["EncodedPixels"]
 
         img_path = os.path.join(images_path,row['ImageId'])
