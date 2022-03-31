@@ -2,6 +2,8 @@ import argparse
 import os
 import pandas as pd
 import shutil
+from os import listdir
+from os.path import isdir, isfile, join
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
@@ -99,8 +101,39 @@ def main(opt):
     print(f"{max}/{max}")
     print(f"Added number of boats: {nr_boats}")
     print(f"Added number of no boats: {nr_no_boats}")
+
+    print("Deleting duplicates!")
+    delete_duplicates(opt)
     print("DONE!")
 
+def delete_duplicates(opt):
+    base_path = opt.dest_dir
+    test_imgs = listdir(f"{base_path}/test/boats")
+    train_imgs = listdir(f"{base_path}/train/boats")
+
+    i = 0
+    for img in test_imgs:
+        if img in train_imgs:
+            if i % 2 == 0:
+                os.remove(f"{base_path}/test/boats/{img}")
+            else:
+                os.remove(f"{base_path}/train/boats/{img}")
+            i += 1
+            print(f"found {img} in boats")
+
+    test_imgs = listdir(f"{base_path}/test/no_boats")
+    train_imgs = listdir(f"{base_path}/train/no_boats")
+
+    i = 0
+    for img in test_imgs:
+        if img in train_imgs:
+            if i % 2 == 0:
+                os.remove(f"{base_path}/test/no_boats/{img}")
+            else:
+                os.remove(f"{base_path}/train/no_boats/{img}")
+            i += 1
+            print(f"found {img} in no_boats")
+            
 if __name__ == "__main__":
     opt = parse_opt()
     main(opt)
