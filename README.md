@@ -12,5 +12,5 @@ python3 train.py --save-dir ../project/shuffleNet-results --save-interval 5 --im
 ````
 
 ````bash
-python3 train_alt.py --save-dir ../project/shuffleNet-results --img-height 768 --img-width 768 --num-classes 2 --batch-size 100 --epochs 1
+python3 train_alt.py --save-dir ../project/base_model_results --img-height 768 --img-width 768 --num-classes 2 --batch-size 100 --epochs 1
 ````
