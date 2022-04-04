@@ -30,7 +30,7 @@ def prepare_dataset(args):
         f"{args.data_dir}/train",
         labels="inferred",
         label_mode="int",
-        class_names=['no_boats', 'boats'],
+        class_names=['boats', 'no_boats'],
         color_mode='rgb',
         batch_size=args.batch_size,
         image_size=(args.img_height, args.img_width),  # reshape if not in this size
@@ -44,7 +44,7 @@ def prepare_dataset(args):
         f"{args.data_dir}/train",
         labels="inferred",
         label_mode="int",  # categorical, binary
-        class_names=['no_boats', 'boats'],
+        class_names=['boats', 'no_boats'],
         color_mode='rgb',
         batch_size=args.batch_size,
         image_size=(args.img_height, args.img_width),  # reshape if not in this size
@@ -58,7 +58,7 @@ def prepare_dataset(args):
         f"{args.data_dir}/test",
         labels="inferred",
         label_mode="int",  # categorical, binary
-        class_names=['no_boats', 'boats'],
+        class_names=['boats', 'no_boats'],
         color_mode='rgb',
         batch_size=args.batch_size,
         image_size=(args.img_height, args.img_width),  # reshape if not in this size
