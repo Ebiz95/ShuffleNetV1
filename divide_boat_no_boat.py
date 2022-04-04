@@ -121,9 +121,6 @@ def test_train_split_fn(opt):
     for img in tqdm(test_no_boats):
         shutil.move(f"{opt.dest_dir}/train/no_boats/{img}", destination_path_no_boats)
 
-
-
-
 def delete_duplicates(opt):
     base_path = opt.dest_dir
     test_imgs = listdir(f"{base_path}/test/boats")
@@ -155,3 +152,4 @@ def delete_duplicates(opt):
 if __name__ == "__main__":
     opt = parse_opt()
     main(opt)
+    test_train_split_fn(opt)

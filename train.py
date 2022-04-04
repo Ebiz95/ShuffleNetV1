@@ -1,8 +1,10 @@
-import os
 import argparse
+import os
 from datetime import datetime
+
 import tensorflow as tf
 from tensorflow import keras
+
 from model import ShuffleNet
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
