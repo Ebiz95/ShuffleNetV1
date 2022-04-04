@@ -1,9 +1,13 @@
 import argparse
 import os
-import pandas as pd
 import shutil
 from os import listdir
 from os.path import isdir, isfile, join
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from tqdm import tqdm
+
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
@@ -25,12 +29,12 @@ def main(opt):
         print(f"'{opt.dest_dir}' directory is created!")
 
     if not os.path.exists(f"{opt.dest_dir}/train/"):
-        print(f"The trining directory does not exist. Creating a new destination directory...")
+        print(f"The train directory does not exist. Creating a new destination directory...")
         os.makedirs(f"{opt.dest_dir}/train/")
         print(f"'{opt.dest_dir}/train/' directory is created!")
 
     if not os.path.exists(f"{opt.dest_dir}/test/"):
-        print(f"The testing directory does not exist. Creating a new destination directory...")
+        print(f"The test directory does not exist. Creating a new destination directory...")
         os.makedirs(f"{opt.dest_dir}/test/")
         print(f"'{opt.dest_dir}/test/' directory is created!")    
 
@@ -70,9 +74,6 @@ def main(opt):
     nr_no_boats = 0
 
     for index, row in df.iterrows():
-        if index == 154044: # 80% split
-            destination_path_boats = f"{opt.dest_dir}/test/boats/"
-            destination_path_no_boats = f"{opt.dest_dir}/test/no_boats/"
         mask = row["EncodedPixels"]
 
         img_path = os.path.join(images_path,row['ImageId'])
@@ -101,10 +102,27 @@ def main(opt):
     print(f"{max}/{max}")
     print(f"Added number of boats: {nr_boats}")
     print(f"Added number of no boats: {nr_no_boats}")
-
-    print("Deleting duplicates!")
-    delete_duplicates(opt)
     print("DONE!")
+
+def test_train_split_fn(opt):
+    boats_files = listdir(f"{opt.dest_dir}/train/boats/")
+    _, test_boats = train_test_split(boats_files, test_size=0.2, shuffle=False)
+    no_boats_files = listdir(f"{opt.dest_dir}/train/no_boats/")
+    _, test_no_boats = train_test_split(no_boats_files, test_size=0.2, shuffle=False)
+
+    destination_path_boats = f"{opt.dest_dir}/test/boats"
+    destination_path_no_boats = f"{opt.dest_dir}/test/no_boats"
+
+    print("Moving boats to test directory...")
+    for img in tqdm(test_boats):
+        shutil.move(f"{opt.dest_dir}/train/boats/{img}", destination_path_boats)
+    
+    print("Moving no_boats to test directory...")
+    for img in tqdm(test_no_boats):
+        shutil.move(f"{opt.dest_dir}/train/no_boats/{img}", destination_path_no_boats)
+
+
+
 
 def delete_duplicates(opt):
     base_path = opt.dest_dir
