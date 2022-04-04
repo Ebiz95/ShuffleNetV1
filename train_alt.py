@@ -18,7 +18,7 @@ def get_args():
 
     parser.add_argument('--img-height', type=int, default=768, help='image height')
     parser.add_argument('--img-width', type=int, default=768, help='image width')
-    parser.add_argument('--val-split', type=int, default=0.2, help='Fraction of training dataset to be used for validation')
+    parser.add_argument('--val-split', type=float, default=0.2, help='Fraction of training dataset to be used for validation')
     parser.add_argument('--num-classes', type=int, default=2, help='number of classes')
 
     parser.add_argument('--data-dir', type=str, default='data/', help='path to data directory')
