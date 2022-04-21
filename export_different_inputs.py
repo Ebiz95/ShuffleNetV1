@@ -1,8 +1,6 @@
 import argparse
 import os
 
-from numpy import float32
-
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
