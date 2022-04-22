@@ -39,19 +39,20 @@ def main():
         print("A directory to the teacher model is required.")
         return
     
-    ds_train, ds_val, ds_test = prepare_dataset(args)
     strategy = tf.distribute.MirroredStrategy()
     with strategy.scope():
         print("Loading teacher model...")
         teacher = keras.models.load_model(args.model_dir)
-        teacher.name = 'teacher'
+        teacher._name = 'teacher'
         print("Loading teacher model done!")
 
         print("Initializing student model...")
         student = base_model(args)
-        student.name = 'student'
+        student._name = 'student'
         print("Initializing student model done!")
 
+        ds_train, ds_val, ds_test = prepare_dataset(args)
+    
         # Initialize and compile distiller
         distiller = Distiller(student=student, teacher=teacher)
         distiller.compile(
@@ -78,3 +79,6 @@ def main():
         print("Saving the model...")
         model_path = f"{args.save_dir}/models/{dt_string}/"
         student.save(model_path)
+
+if __name__ == '__main__':
+    main()
