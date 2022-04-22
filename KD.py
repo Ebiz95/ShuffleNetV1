@@ -39,46 +39,46 @@ def main():
         print("A directory to the teacher model is required.")
         return
     
-    strategy = tf.distribute.MirroredStrategy()
-    with strategy.scope():
-        print("Loading teacher model...")
-        teacher = keras.models.load_model(args.model_dir)
-        teacher._name = 'teacher'
-        print("Loading teacher model done!")
+    # strategy = tf.distribute.MirroredStrategy()
+    # with strategy.scope():
+    print("Loading teacher model...")
+    teacher = keras.models.load_model(args.model_dir)
+    teacher._name = 'teacher'
+    print("Loading teacher model done!")
 
-        print("Initializing student model...")
-        student = base_model(args)
-        student._name = 'student'
-        print("Initializing student model done!")
+    print("Initializing student model...")
+    student = base_model(args)
+    student._name = 'student'
+    print("Initializing student model done!")
 
-        ds_train, ds_val, ds_test = prepare_dataset(args)
-    
-        # Initialize and compile distiller
-        distiller = Distiller(student=student, teacher=teacher)
-        distiller.compile(
-            optimizer=keras.optimizers.Adam(),
-            metrics=[keras.metrics.SparseCategoricalAccuracy()],
-            student_loss_fn=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-            distillation_loss_fn=keras.losses.KLDivergence(),
-            alpha=0.1,
-            temperature=10,
-        )
+    ds_train, ds_val, ds_test = prepare_dataset(args)
 
-        # Distill teacher to student
-        distiller.fit(ds_train, validation_data=ds_val, epochs=args.epochs, verbose=1)
+    # Initialize and compile distiller
+    distiller = Distiller(student=student, teacher=teacher)
+    distiller.compile(
+        optimizer=keras.optimizers.Adam(),
+        metrics=[keras.metrics.SparseCategoricalAccuracy()],
+        student_loss_fn=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        distillation_loss_fn=keras.losses.KLDivergence(),
+        alpha=0.1,
+        temperature=10,
+    )
 
-        # Evaluate student on test dataset
-        distiller.evaluate(ds_test)
+    # Distill teacher to student
+    distiller.fit(ds_train, validation_data=ds_val, epochs=args.epochs, verbose=1)
 
-        now = datetime.now()
-        dt_string = now.strftime("%d-%m-%Y_%H:%M")
+    # Evaluate student on test dataset
+    distiller.evaluate(ds_test)
 
-        print("Saving weights...")
-        student.save_weights(f"{args.save_dir}/model_weights/{dt_string}/")
+    now = datetime.now()
+    dt_string = now.strftime("%d-%m-%Y_%H:%M")
 
-        print("Saving the model...")
-        model_path = f"{args.save_dir}/models/{dt_string}/"
-        student.save(model_path)
+    print("Saving weights...")
+    student.save_weights(f"{args.save_dir}/model_weights/{dt_string}/")
+
+    print("Saving the model...")
+    model_path = f"{args.save_dir}/models/{dt_string}/"
+    student.save(model_path)
 
 if __name__ == '__main__':
     main()
