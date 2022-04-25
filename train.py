@@ -6,6 +6,7 @@ import tensorflow as tf
 from tensorflow import keras
 
 from model import ShuffleNet
+from prepare_dataset import prepare_dataset
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
@@ -30,49 +31,13 @@ def get_args():
     args = parser.parse_args()
     return args
 
-def prepare_dataset(args):
-    ds_train = keras.preprocessing.image_dataset_from_directory(
-        args.data_dir,
-        labels="inferred",
-        label_mode="int",
-        class_names=['boats', 'no_boats'],
-        color_mode='rgb',
-        batch_size=args.batch_size,
-        image_size=(args.img_height, args.img_width),  # reshape if not in this size
-        shuffle=True,
-        seed=123,
-        validation_split=0.15,
-        subset="training",
-    )
-
-    ds_validation = tf.keras.preprocessing.image_dataset_from_directory(
-        args.data_dir,
-        labels="inferred",
-        label_mode="int",  # categorical, binary
-        class_names=['boats', 'no_boats'],
-        color_mode='rgb',
-        batch_size=args.batch_size,
-        image_size=(args.img_height, args.img_width),  # reshape if not in this size
-        shuffle=True,
-        seed=123,
-        validation_split=0.15,
-        subset="validation",
-    )
-
-    return ds_train, ds_validation
-
 def main():
     args = get_args()
     print(f"groups: {args.groups}")
     print(f"num classes: {args.num_classes}")
     print(f"batch size: {args.batch_size}")
 
-    ds_train, ds_val = prepare_dataset(args)
-
-    AUTOTUNE = tf.data.AUTOTUNE
-
-    ds_train = ds_train.cache().prefetch(buffer_size=AUTOTUNE)
-    ds_val = ds_val.cache().prefetch(buffer_size=AUTOTUNE)
+    ds_train, ds_val, ds_test = prepare_dataset(args)
 
     strategy = tf.distribute.MirroredStrategy()
     with strategy.scope():
@@ -88,7 +53,7 @@ def main():
         model.compile(
             optimizer=keras.optimizers.Adam(),
             loss=[keras.losses.SparseCategoricalCrossentropy(from_logits=True),],
-            metrics=["accuracy"],
+            metrics=[keras.metrics.SparseCategoricalAccuracy(), "accuracy"],
         )
         print("Model compiling done")
 
@@ -98,34 +63,17 @@ def main():
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y_%H:%M")
 
-        # cp_callback = tf.keras.callbacks.ModelCheckpoint(
-        #     filepath=checkpoint_path,
-        #     verbose=1,
-        #     save_weights_only=True,
-        #     save_freq=args.save_interval * args.batch_size # Number of images / batch_size
-        # )
-
         model.fit(ds_train, validation_data=ds_val, epochs=args.epochs, verbose=1)
+        
+        print("Evaluating the model on the test dataset...")
+        model.evaluate(ds_test)
+
+        print("Saving weights")
         model.save_weights(f"{args.save_dir}/model_weights/{dt_string}/")
 
+        print("Saving model")
         model_path = f"{args.save_dir}/models/{dt_string}/"
         model.save(model_path)
-
-        print("Init converter")
-        converter = tf.lite.TFLiteConverter.from_keras_model(model)
-        converter.target_spec.supported_types = [tf.float16]
-        print("Init converter done")
-        print("Converting model")
-        tflite_model = converter.convert()
-        print("Converting model done")
-
-        tflite_model_path = f"{args.save_dir}/models-tflite/{dt_string}"
-        if not os.path.exists(tflite_model_path):
-            os.makedirs(tflite_model_path)
-            print(f"'{tflite_model_path}' directory is created!")
-
-        with open(f"{tflite_model_path}/model.tflite", 'wb') as f:
-            f.write(tflite_model)
 
 if __name__ == "__main__":
     main()
