@@ -15,14 +15,15 @@ def get_args():
 
     parser.add_argument('--batch-size', type=int, default=128, help='batch size')
     parser.add_argument('--epochs', type=int, default=100, help='total epochs')
-    parser.add_argument('--save-dir', type=str, default='./models', help='path for saving trained models')
-    parser.add_argument('--save-interval', type=int, default=10, help='save interval')
+    parser.add_argument('--val-split', type=float, default=0.2, help='Fraction of training dataset to be used for validation')
+
 
     parser.add_argument('--img-height', type=int, default=768, help='image height')
     parser.add_argument('--img-width', type=int, default=768, help='image width')
     parser.add_argument('--num-classes', type=int, default=2, help='number of classes')
     parser.add_argument('--groups', type=int, default=3, help='groups number')
 
+    parser.add_argument('--save-dir', type=str, default='./models', help='path for saving trained models')
     parser.add_argument('--data-dir', type=str, default='data/', help='path to training dataset')
 
     parser.add_argument('--weights-path', type=str, default=None, help='path to saved model weights')
