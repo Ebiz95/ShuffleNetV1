@@ -6,6 +6,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
+from base_model import base_model
 from prepare_dataset import prepare_dataset
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
@@ -14,9 +15,8 @@ def get_args():
     parser = argparse.ArgumentParser("ShuffleNetV1")
 
     parser.add_argument('--batch-size', type=int, default=128, help='batch size')
-    parser.add_argument('--epochs', type=int, default=100, help='total epochs')
+    parser.add_argument('--epochs', type=int, default=2, help='total epochs')
     parser.add_argument('--save-dir', type=str, default='./models', help='path for saving trained models')
-    # parser.add_argument('--save-interval', type=int, default=10, help='save interval')
 
     parser.add_argument('--img-height', type=int, default=768, help='image height')
     parser.add_argument('--img-width', type=int, default=768, help='image width')
@@ -41,19 +41,7 @@ def main():
         print("Init model")
         # model = ShuffleNet(groups=args.groups, num_classes=args.num_classes)
 
-        model = keras.Sequential(
-            [
-                keras.Input(shape=(args.img_height, args.img_width, 3)),
-                layers.Conv2D(filters=24, kernel_size=3, strides=2, activation='relu', padding='same'),
-                layers.MaxPool2D(pool_size=3, strides=2, padding='same'),
-                layers.Conv2D(filters=144, kernel_size=3, strides=2, activation='relu', padding='same'),
-                layers.MaxPool2D(pool_size=3, strides=2, padding='same'),
-                layers.GlobalAveragePooling2D(),
-                layers.Dense(512, activation="relu"),
-                layers.Dense(256, activation="relu"),
-                layers.Dense(args.num_classes, activation='softmax'),
-            ]
-        )
+        model = base_model(args)
 
         print("Init model done")
 
@@ -76,13 +64,6 @@ def main():
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y_%H:%M")
 
-        # cp_callback = tf.keras.callbacks.ModelCheckpoint(
-        #     filepath=checkpoint_path,
-        #     verbose=1,
-        #     save_weights_only=True,
-        #     save_freq=args.save_interval * args.batch_size # Number of images / batch_size
-        # )
-
         model.fit(ds_train, validation_data=ds_val, epochs=args.epochs, verbose=1)
         
         print("Evaluating the model on the test dataset...")
@@ -94,22 +75,6 @@ def main():
         print("Saving the model...")
         model_path = f"{args.save_dir}/models/{dt_string}/"
         model.save(model_path)
-
-        print("Init converter")
-        converter = tf.lite.TFLiteConverter.from_keras_model(model)
-        converter.target_spec.supported_types = [tf.float32]
-        print("Init converter done")
-        print("Converting model")
-        tflite_model = converter.convert()
-        print("Converting model done")
-
-        tflite_model_path = f"{args.save_dir}/models-tflite/{dt_string}"
-        if not os.path.exists(tflite_model_path):
-            os.makedirs(tflite_model_path)
-            print(f"'{tflite_model_path}' directory is created!")
-
-        with open(f"{tflite_model_path}/model.tflite", 'wb') as f:
-            f.write(tflite_model)
 
 if __name__ == "__main__":
     main()

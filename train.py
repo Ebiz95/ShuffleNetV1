@@ -38,10 +38,10 @@ def main():
     print(f"num classes: {args.num_classes}")
     print(f"batch size: {args.batch_size}")
 
-    ds_train, ds_val, ds_test = prepare_dataset(args)
 
     strategy = tf.distribute.MirroredStrategy()
     with strategy.scope():
+        ds_train, ds_val, ds_test = prepare_dataset(args)
         print("Init model")
         model = ShuffleNet(groups=args.groups, num_classes=args.num_classes)
         print("Init model done")
