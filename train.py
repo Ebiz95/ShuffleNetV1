@@ -54,7 +54,7 @@ def main():
         model.compile(
             optimizer=keras.optimizers.Adam(),
             loss=[keras.losses.SparseCategoricalCrossentropy(from_logits=True),],
-            metrics=[keras.metrics.SparseCategoricalAccuracy(), "accuracy"],
+            metrics=[keras.metrics.SparseCategoricalAccuracy(),],
         )
         print("Model compiling done")
 

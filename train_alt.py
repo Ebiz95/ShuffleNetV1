@@ -53,7 +53,7 @@ def main():
                 # keras.losses.BinaryCrossentropy(),
             ],
             metrics=[
-                "accuracy", 
+                keras.metrics.SparseCategoricalAccuracy(), 
                 # "binary_crossentropy",
             ],
         )
