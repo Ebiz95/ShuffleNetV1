@@ -36,7 +36,7 @@ def get_args():
 def main():
     args = get_args()
     
-    if args.model_dir is None:
+    if args.teacher_model_dir is None:
         print("A directory to the teacher model is required.")
         return
     
