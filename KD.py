@@ -43,7 +43,7 @@ def main():
     # strategy = tf.distribute.MirroredStrategy()
     # with strategy.scope():
     print("Loading teacher model...")
-    teacher = keras.models.load_model(args.model_dir)
+    teacher = keras.models.load_model(args.teacher_model_dir)
     teacher._name = 'teacher'
     print("Loading teacher model done!")
 
