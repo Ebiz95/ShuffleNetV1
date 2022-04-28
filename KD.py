@@ -27,7 +27,8 @@ def get_args():
     parser.add_argument('--data-dir', type=str, default='data/', help='path to training dataset')
 
     # parser.add_argument('--weights-path', type=str, default=None, help='path to saved teacher model weights')
-    parser.add_argument('--model-dir', type=str, default=None, help='path to saved teacher model')
+    parser.add_argument('--teacher-model-dir', type=str, default=None, help='path to saved teacher model')
+    parser.add_argument('--student-model-dir', type=str, default=None, help='path to saved teacher model')
 
     args = parser.parse_args()
     return args
@@ -46,10 +47,16 @@ def main():
     teacher._name = 'teacher'
     print("Loading teacher model done!")
 
-    print("Initializing student model...")
-    student = base_model(args)
+    if not args.student_model_dir is None:
+        # model.built = True
+        print("Loading the student model...")
+        student = keras.models.load_model(args.student_model_dir)
+        print("Loading the student model done!")
+    else:
+        print("Initializing student model...")
+        student = base_model(args)
+        print("Initializing student model done!")
     student._name = 'student'
-    print("Initializing student model done!")
 
     ds_train, ds_val, ds_test = prepare_dataset(args)
 
